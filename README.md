@@ -43,3 +43,9 @@ Now that everything is flashed and plugged in, you just need to connect to the E
 - 3 beeps in a descending tone: The reset button has been pressed
 - Single beep: Ready!
 - Single (lower pitched) beep: Someone beeped it!
+
+### The STL File!
+Yes, there is an STL for a "Not A Fire Alarm". The LED whole is a tad small, but can be resized. Otherwise, just chuck everything in there. It's free real estate.
+
+#### But... There's no hole for the micro-usb!
+Good observation, use a battery bank, or batteries. Just don't do what I did a plug 4AA batteries into the 3v3 or you'll fry your board... Whoops.
