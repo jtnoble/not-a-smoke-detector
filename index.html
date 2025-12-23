@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Not A Smoke Detector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="smoke-detector.png">
+
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0f172a;
+      --primary: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --success: #22c55e;
+      --error: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #020617, #0f172a);
+      font-family: system-ui, sans-serif;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+      text-align: center;
+    }
+
+    h2 {
+      margin: 0 0 0.25rem;
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      width: 100%;
+      font-size: 1.15rem;
+      font-weight: 600;
+      padding: 1rem;
+      border-radius: 14px;
+      border: none;
+      background: var(--primary);
+      color: #020617;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(56,189,248,0.35);
+    }
+
+    button:disabled {
+      background: #334155;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .status {
+      margin-top: 1rem;
+      min-height: 1.4em;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .status.sending { color: var(--primary); }
+    .status.success { color: var(--success); }
+    .status.error   { color: var(--error); }
+
+    .divider {
+      height: 1px;
+      background: #1e293b;
+      margin: 1.75rem 0;
+    }
+
+    details {
+      text-align: left;
+      margin-bottom: 0.75rem;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 0.9rem;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .section {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #cbd5f5;
+    }
+
+    .field {
+      margin-bottom: 0.75rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.55rem;
+      border-radius: 8px;
+      border: none;
+      background: #020617;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    code {
+      display: block;
+      background: #020617;
+      padding: 0.6rem;
+      border-radius: 8px;
+      margin: 0.4rem 0;
+      color: var(--primary);
+      font-size: 0.85rem;
+      word-break: break-word;
+    }
+
+    ul {
+      padding-left: 1.25rem;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Not A Smoke Detector</h2>
+    <div class="subtitle">Remote-controlled ESP32 beeper prank</div>
+
+    <button id="trigger">Send Beep</button>
+    <div id="status" class="status">Ready</div>
+
+    <div class="divider"></div>
+
+    <!-- SETUP -->
+    <details>
+      <summary>Generating a link</summary>
+      <div class="section">
+        <div class="field">
+          <input id="u" placeholder="Adafruit IO Username">
+        </div>
+        <div class="field">
+          <input id="k" placeholder="Adafruit IO Key">
+        </div>
+        <div class="field">
+          <input id="f" placeholder="Feed name (e.g. beeper)">
+        </div>
+
+        <strong>Example link for this page:</strong>
+        <code id="exampleUrl"></code>
+
+        <p>Bookmark or share this link to trigger the beeper remotely.</p>
+      </div>
+    </details>
+
+    <!-- README -->
+    <details>
+      <summary>Instructions</summary>
+      <div class="section">
+        <h4>What?</h4>
+        <p>
+          <strong>Not A Smoke Detector</strong> is an ESP32-based prank.
+          You know that low-battery smoke detector beep?
+          Now you can trigger it remotely 😈
+        </p>
+
+        <h4>WiFi Setup</h4>
+        <p>If you're setting up your ESP32-based <strong>Not A Smoke Detector</strong>, look here!</p>
+        <ul>
+          <li>Connect to <strong>BEEPER_WIFI</strong><ul><li>The default password is: beeper1234</li></ul></li>
+          
+          <li>Navigate to <code>192.168.4.1</code>on your browser.</li>
+          <li>Enter WiFi + Adafruit IO credentials</li>
+          <li>Save and wait for the ready beep</li>
+        </ul>
+
+        <h4>Beeps Explained</h4>
+        <ul>
+          <li>3 same-tone beeps: Setup mode</li>
+          <li>3 descending beeps: Reset pressed</li>
+          <li>Single beep: Ready</li>
+          <li>Low beep: Someone triggered it</li>
+        </ul>
+
+        <h4>Resetting?</h4>
+        <p>The built-in reset button will reset the WiFi credentials on the board. Press this for a reset. Of course, if you happen to take this out of range, the ESP32 will recognize this, and enter setup mode on its own.</p>
+
+        <h4>Source Code</h4>
+        <p>
+          GitHub:
+          <a href="https://github.com/jtnoble/not-a-smoke-detector" target="_blank">
+            https://github.com/jtnoble/not-a-smoke-detector
+          </a>
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/paho-mqtt.min.js"></script>
+
+  <script>
+    // MQTT CONFIG (UNCHANGED)
+    const params = new URLSearchParams(window.location.search);
+    const ADA_USERNAME = params.get("username");
+    const ADA_KEY      = params.get("key");
+    const FEED_KEY     = params.get("feed");
+    const topic = `${ADA_USERNAME}/feeds/${FEED_KEY}`;
+
+    const clientId = "web-trigger-" + Math.floor(Math.random() * 10000);
+    const client = new Paho.Client("wss://io.adafruit.com:443/mqtt/", clientId);
+
+    const button = document.getElementById("trigger");
+    const status = document.getElementById("status");
+
+    client.onConnectionLost = () => {
+      status.textContent = "Connection lost";
+      status.className = "status error";
+    };
+
+    if (ADA_USERNAME && ADA_KEY && FEED_KEY) {
+      client.connect({
+        userName: ADA_USERNAME,
+        password: ADA_KEY,
+        useSSL: true,
+        onSuccess: () => status.textContent = "Connected",
+        onFailure: () => {
+          status.textContent = "Connection failed";
+          status.className = "status error";
+        }
+      });
+    } else {
+      status.textContent = "Enter setup info below";
+    }
+
+
+    button.addEventListener("click", () => {
+      if (client.isConnected()) {
+        button.disabled = true;
+        status.textContent = "Sending beep…";
+        status.className = "status sending";
+
+        const message = new Paho.Message("true");
+        message.destinationName = topic;
+        client.send(message);
+
+        setTimeout(() => {
+          status.textContent = "Sent!";
+          status.className = "status success";
+          button.disabled = false;
+        }, 500);
+      } else {
+        status.textContent = "Not connected";
+        status.className = "status error";
+      }
+    });
+
+    // URL GENERATOR
+    const u = document.getElementById("u");
+    const k = document.getElementById("k");
+    const f = document.getElementById("f");
+    const out = document.getElementById("exampleUrl");
+
+    function updateExample() {
+      const base = `${location.origin}${location.pathname}`;
+
+      if (!u.value || !k.value || !f.value) {
+        out.textContent = `${base}?username=YOUR_USERNAME&key=YOUR_KEY&feed=YOUR_FEED`;
+        return;
+      }
+
+      const qs = new URLSearchParams({
+        username: u.value,
+        key: k.value,
+        feed: f.value
+      });
+
+      out.textContent = `${base}?${qs.toString()}`;
+    }
+
+
+    u.addEventListener("input", updateExample);
+    k.addEventListener("input", updateExample);
+    f.addEventListener("input", updateExample);
+    updateExample();
+  </script>
+</body>
+</html>
