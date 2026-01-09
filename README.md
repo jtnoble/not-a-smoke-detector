@@ -25,7 +25,7 @@ You can get a good gauge of how to do this with the code, but here's what I did.
 - ESP32 PIN GND -> LED-
 - ESP32 PIN GND -> Buzzer-
 - ESP32 PIN GND -> Button-
-- ESP32 PIN 25 -> 100ohm Resistor -> Buzzer+
+- ESP32 PIN 25 -> Buzzer+
 - ESP32 PIN 26 -> 220ohm Resistor -> LED+
 - ESP32 PIN 27 -> Button+
 
@@ -38,14 +38,18 @@ Now that everything is flashed and plugged in, you just need to connect to the E
 - The ESP32 will now reboot. Once you hear the beep, its ready!
 - Run `python3 send_mqtt_ping.py` just to be sure it all works.
 
+### Right, But How Do Others Ping It?
+Two ways:
+1. Use the website: https://jtnoble.github.io/not-a-smoke-detector
+2. Use the `send_mqtt_ping.py` file as a sort of API for your own application.
+
 ### The Beeps Mason, What Do They Mean?
-- 3 beeps of the same tone: Entered Setup Mode
-- 3 beeps in a descending tone: The reset button has been pressed
-- Single beep: Ready!
-- Single (lower pitched) beep: Someone beeped it!
+- Single Beep: Ready / Someone beeped!
+- Two Beeps: RESET pressed!
+- Three Beeps: 
 
 ### The STL File!
-Yes, there is an STL for a "Not A Fire Alarm". The LED whole is a tad small, but can be resized. Otherwise, just chuck everything in there. It's free real estate.
+Yes, there is an STL for a "Not A Fire Alarm". The LED whole is a tad small, but can be shoved in there. Otherwise, just chuck everything in there. It's free real estate.
 
-#### But... There's no hole for the micro-usb!
-Good observation, use a battery bank, or batteries. Just don't do what I did a plug 4AA batteries into the 3v3 or you'll fry your board... Whoops.
+#### But... Power???
+Use a battery bank, batteries, plug it directly in, up to you. Just don't do what I did a plug 4AA batteries into the 3v3 or you'll fry your board... Whoops.

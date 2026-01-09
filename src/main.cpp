@@ -23,7 +23,7 @@
 #include <PubSubClient.h>
 
 // -------------------- Hardware / user config --------------------
-const int BUZZER_PIN = 25;          // GPIO that drives the piezo (use a transistor if buzzer draws >20mA)
+const int BUZZER_PIN = 25;          // GPIO that drives the active buzzer
 const int LED_PIN = 26;             // Pin for the LED
 const int RESET_BTN = 27;           // Pin for the reset button
 const char* AP_SSID = "BEEPER-SETUP";
@@ -31,7 +31,7 @@ const char* AP_PASS = "beeper1234"; // optional, keep >=8 chars for phones that 
 
 // Power-saving config
 // Use LIGHT_SLEEP via WiFi power-save (modem PS). This keeps connection but reduces average draw.
-const bool ENABLE_WIFI_POWERSAVE = true;
+const bool ENABLE_WIFI_POWERSAVE = false;
 
 // If MQTT cannot connect repeatedly, open provisioning AP again after N attempts
 const int MQTT_MAX_CONNECT_ATTEMPTS = 6;
@@ -78,31 +78,44 @@ const char CONFIG_PAGE[] PROGMEM = R"rawliteral(
 <label>Feed Key (e.g. beeper)</label><input name="feed_key" value="beeper" required>
 <button type="submit">Save & Reboot</button>
 </form>
-<p>3 same tone beeps means you have entered setup mode, which is this one!</p>
+<p>A single beep means you have turned on the device and it has connected to the network!</p>
 <p>To reset for a new WiFi network, press the RESET button.</p>
-<p>3 descending tone beeps means you have clicked the reset button!</p>
-<p>A single beep means you have turned on the device</p>
-<p>If after a few seconds you enter setup mode, this likely means you entered your SSID or Password incorrectly!</p>
+<p>2 beeps means you have clicked the reset button!</p>
+<p>3 beeps means you have entered setup mode, which is this one!</p>
+<p>If you saved your settings, and after a reboot you re-enter setup mode, this likely means you entered your SSID or Password incorrectly!</p>
 </body>
 </html>
 )rawliteral";
 
 // ---------- Helpers ----------
 void beep() {
+  // Enable buzzer pin
+  pinMode(BUZZER_PIN, OUTPUT);
   // quick beep pattern
-  tone(BUZZER_PIN, 3000, 200);
+  digitalWrite(BUZZER_PIN, HIGH);
   digitalWrite(LED_PIN, HIGH);
-  delay(250);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
   digitalWrite(LED_PIN, LOW);
+  // Disable buzzer pin (for high pitched ring)
+  pinMode(BUZZER_PIN, OUTPUT);
 }
 
 void beepNeedsConfig() {
   // beep to signify setup required
-  tone(BUZZER_PIN, 2000, 200);
-  delay(250);
-  tone(BUZZER_PIN, 2000, 200);
-  delay(250);
-  tone(BUZZER_PIN, 2000, 200);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(50);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(200);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(50);
+  digitalWrite(BUZZER_PIN, LOW);
+  delay(200);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(50);
+  digitalWrite(BUZZER_PIN, LOW);
+  pinMode(BUZZER_PIN, INPUT);
 }
 
 // Save credentials and aio settings into preferences
@@ -152,12 +165,17 @@ void handleSave() {
 }
 
 void handleResetPrefs() {
+  pinMode(BUZZER_PIN, OUTPUT);
   prefs.begin("config", false);
-  tone(BUZZER_PIN, 2000, 200);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(50);
+  digitalWrite(BUZZER_PIN, LOW);
   delay(250);
-  tone(BUZZER_PIN, 1500, 200);
-  delay(250);
-  tone(BUZZER_PIN, 1000, 200);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(50);
+  digitalWrite(BUZZER_PIN, LOW);
+  pinMode(BUZZER_PIN, INPUT);
+
   prefs.clear();
   prefs.end();
   delay(500);
@@ -285,11 +303,15 @@ bool tryConnectWiFi(const char* ssid, const char* pass) {
 
 // -------------------- setup & loop --------------------
 void setup() {
+  // Set CPU frequency to 80 MHz
+  setCpuFrequencyMhz(80);
+  
   Serial.begin(115200);
   delay(50);
 
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(BUZZER_PIN, LOW);
+  pinMode(BUZZER_PIN, INPUT); // float when idle
 
   pinMode(RESET_BTN, INPUT_PULLUP);
 
